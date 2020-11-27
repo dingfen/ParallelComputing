@@ -58,18 +58,22 @@ int _2() {
     copy_array(C2, C, 102);
     copy_array(D2, D, n);
 
-    omp_set_num_threads(10);
+    omp_set_num_threads(5);
 
     clock_t start = clock();
     x = y * 2;
+    #pragma omp parallel for
     for(int i = 1; i <= 100; i++) {
         C[i] = B[i] + x;
+    }
+    #pragma omp parallel for
+    for(int i = 1; i <= 100; i++) {
         A[i] = C[i-1] + z;
-        C[i+1] = A[i] * B[i];
         for(int j = 1; j <= 50; j++) {
             D[IN(i, j, 51)] = D[IN(i, j-1, 51)] + x;
         }
     }
+    C[101] = A[100] * B[100];
     z = y + 4;
     clock_t end = clock();
     printf("OpenMP costs : %Lf\n", (long double)(end-start)/CLOCKS_PER_SEC);
