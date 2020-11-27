@@ -66,7 +66,6 @@ int _2() {
     clock_t start = clock();
     
     for(int i = 1; i <= 100; i++) {
-        X[i] = Y[i] + 10;
         for(int j = 1; j <= 100; j++) {
             B[j] = A[IN(i,N,110)];
             #pragma omp parallel for
@@ -76,6 +75,10 @@ int _2() {
             Y[i+j] = A[IN(j+1, N, 110)];
         }
     }
+    #pragma omp parallel for
+    for(int i = 1; i <= 100; i++)
+        X[i] = Y[i] + 10;
+
     clock_t end = clock();
     printf("OpenMP costs : %Lf\n", (long double)(end-start)/CLOCKS_PER_SEC);
 
