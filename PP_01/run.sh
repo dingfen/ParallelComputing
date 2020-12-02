@@ -1,7 +1,6 @@
 make 
 
-./1
-./2
-./3
-./4
-./5
+for file in `ls build`
+do
+    ./build/${file}
+done

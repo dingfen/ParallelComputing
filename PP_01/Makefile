@@ -8,6 +8,8 @@ all : $(OBJS)
 	@echo "编译中..."
 	@echo $(SOURCES)
 	@echo "编译完成！"
+	if [ ! -d "build" ]; then mkdir build; fi
+	mv $(OBJS) build
 	
 
 %: %.c
@@ -15,4 +17,4 @@ all : $(OBJS)
 
 .PHONY: clean
 clean: 
-	rm  $(OBJS)
+	rm  -rf build/

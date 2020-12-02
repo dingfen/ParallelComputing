@@ -1,5 +1,8 @@
 make 
 
-mpiexec -n 9 ./1
-time mpiexec -n 9 ./2
-time mpiexec -n 9 ./3
+for file in `ls build`
+do
+    echo "*********************"
+    echo "Lab02 " ${file} " program :"
+    time mpiexec -n 9 ./build/${file}
+done

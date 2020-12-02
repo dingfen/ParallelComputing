@@ -1,12 +1,15 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char *argv[])
 {
     int id_procs, num_procs;
     int msg = 10;
     int tag = 5;
+    char seq[16] = "Hello MPI!";
+    char seqin[16];
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
@@ -28,19 +31,17 @@ int main(int argc, char *argv[])
 
     // message to 0 proc of Each Comm
     if (id_procs == 0) {
-        msgin = msg;
+        strcpy(seqin, seq);
         for (int i = 1; i < 3; i++)
-            MPI_Send(&msg, 1, MPI_INT, i, tag, MPI_COMM_WORLD);
+            MPI_Send(&seq, 16, MPI_CHAR, i, tag, MPI_COMM_WORLD);
     } else if (id_procs > 0 && id_procs < 3) {
-        MPI_Recv(&msgin, 1, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+        MPI_Recv(&seqin, 16, MPI_CHAR, 0, tag, MPI_COMM_WORLD, &status);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
 
     // Broadcast within the group
-    MPI_Bcast(&msgin, 1, MPI_INT, 0, split_comm_world);
+    MPI_Bcast(&seqin, 16, MPI_CHAR, 0, split_comm_world);
 
-    MPI_Barrier(split_comm_world);
-    printf("MPI Comm rank %d, original id %d, size %d. the new msg is %d\n", rank, id_procs, size, msgin);
+    printf("MPI Comm rank %d, original id %d, size %d. the new msg is %s\n", rank, id_procs, size, seqin);
     MPI_Finalize();
     return 0;
 }
