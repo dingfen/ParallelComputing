@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // P0 broadcast 3 lines of A to each Proc
+    // Proc#N-1 broadcast 3 lines of A to each Proc
     int ctn = 0;
     for(int i = 0; i < N-2; i++) {
         if (id_procs == num_1) {
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 
     if (id_procs == num_1) {
         if(check(B, B2)) {
-            printf("Done.\n");
+            printf("Done.No Error\n");
         } else {
             printf("Error Occured!\n");
         }
