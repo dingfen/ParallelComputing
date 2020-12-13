@@ -1,6 +1,7 @@
 CC=mpicc
 OPENMP=
 SOURCES:=$(shell find $(.) -name '*.c')
+LIB=-lm
 OBJS=$(SOURCES:%.c=%)
 
 
@@ -11,7 +12,7 @@ all : $(OBJS)
 	mv $(OBJS) build
 
 %: %.c
-	$(CC) $(OPENMP) $< -o $@
+	$(CC) $(OPENMP) $< $(LIB) -o $@
 
 .PHONY: clean
 clean: 
