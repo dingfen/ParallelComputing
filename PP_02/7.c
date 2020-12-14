@@ -65,18 +65,18 @@ int main(int argc, char *argv[]) {
         if (id_procs == num_1) {
             int dest = i % num_1;
             int tag = i / num_1;
-            MPI_Send(A+i*N, N*3, MPI_DOUBLE, dest, tag, MPI_COMM_WORLD);
+            MPI_Send(&A[INDEX(i, 0)], N*3, MPI_DOUBLE, dest, tag, MPI_COMM_WORLD);
         }
     }
 
     for(int i = 0; i < (N-2)/num_1; i++) {
         if (id_procs != num_1) {
-            MPI_Recv(A+ctn*3*N, 3*N, MPI_DOUBLE, num_1, ctn, MPI_COMM_WORLD, &status);
+            MPI_Recv(&A[INDEX(3*ctn, 0)], 3*N, MPI_DOUBLE, num_1, ctn, MPI_COMM_WORLD, &status);
             ctn++;
         }
     }
     if (id_procs < (N-2) % num_1) {
-        MPI_Recv(A+ctn*3*N, 3*N, MPI_DOUBLE, num_1, ctn, MPI_COMM_WORLD, &status);
+        MPI_Recv(&A[INDEX(ctn*3, 0)], 3*N, MPI_DOUBLE, num_1, ctn, MPI_COMM_WORLD, &status);
         ctn++;
     }
 
@@ -93,11 +93,11 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < N-2; i++) {
         if (id_procs == num_1) {
             int src = i % num_1;
-            MPI_Recv(B+(i+1)*N+1, N-2, MPI_DOUBLE, src, i/num_1+N, MPI_COMM_WORLD, &status);
+            MPI_Recv(&B[INDEX(i+1, 1)], N-2, MPI_DOUBLE, src, i/num_1+N, MPI_COMM_WORLD, &status);
         }
         else {
             for(int j = 0; j < ctn; j++)
-                MPI_Send(B+(j+1)*N+1, N-2, MPI_DOUBLE, num_1, j+N, MPI_COMM_WORLD);
+                MPI_Send(&B[INDEX(j+1, 1)], N-2, MPI_DOUBLE, num_1, j+N, MPI_COMM_WORLD);
         }
     }
 
