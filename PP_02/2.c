@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    for(int i = 0; i < num_procs; i++)
-        print(i, id_procs, num_procs, recvbuf);
+    // for(int i = 0; i < num_procs; i++)
+    //     print(i, id_procs, num_procs, recvbuf);
 
     MPI_Finalize();
     return 0;

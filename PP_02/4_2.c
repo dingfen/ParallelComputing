@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
     MPI_Comm_rank(MPI_COMM_WORLD, &id_procs);
 
-    srand(time(NULL));
-    int data = rand() % 100+id_procs;
+    srand(clock());
+    int data = rand() % 100;
     int recvdata;
     MPI_Status status;
 
@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
             MPI_Recv(&recvdata, 1, MPI_INT, id_procs+tag, tag, MPI_COMM_WORLD, &status);
         }
         data += recvdata;
-        MPI_Barrier(MPI_COMM_WORLD);
     }
 
     // now 0 process has the sum

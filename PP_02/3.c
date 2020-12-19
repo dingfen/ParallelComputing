@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     MPI_Alltoall(sendbuf, 1, MPI_INT, recvbuf, 1, MPI_INT, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    for(int i = 0; i < num_procs; i++)
-        print(i, id_procs, num_procs, recvbuf);
+    // for(int i = 0; i < num_procs; i++)
+    //     print(i, id_procs, num_procs, recvbuf);
 
     MPI_Finalize();
     return 0;
