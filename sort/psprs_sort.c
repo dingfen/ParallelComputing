@@ -1,15 +1,8 @@
-#include <stdio.h>
-#include <mpi.h>
-#include <stdlib.h>
-
-int compare(const void *p1, const void *p2)
-{
-    return (*(int *)p1 - *(int *)p2);
-}
+#include "sort.h"
 
 //Merge函数合并两个子数组形成单一的已排好序的字数组
 //并代替当前的子数组A[p..r]
-void Merge(int *a, int p, int q, int r)
+void merge(int *a, int p, int q, int r)
 {
     int i, j, k;
     int n1 = q - p + 1;
@@ -37,30 +30,25 @@ void Merge(int *a, int p, int q, int r)
         }
     }
 }
+
+
 //归并排序
-void MergeSort(int *a, int p, int r)
+void merge_sort(int *a, int p, int r)
 {
     if (p < r)
     {
         int q = (p + r) / 2;
-        MergeSort(a, p, q);
-        MergeSort(a, q + 1, r);
-        Merge(a, p, q, r);
+        merge_sort(a, p, q);
+        merge_sort(a, q + 1, r);
+        merge(a, p, q, r);
     }
 }
 
 
-void debug(int *array, int len)
-{
-    for (int i = 0; i < len; i++)
-        printf("%d,", array[i]);
-    printf("\n");
-}
-
 int main(int argc, char *argv[])
 {
-    int array[1024];
-    int result[1024];
+    int *array;
+    int *result;
     int len;
     int processors;
     int id;
@@ -69,11 +57,15 @@ int main(int argc, char *argv[])
     int mod;
 
     int i, index;
-    // 读入数据部分
-    FILE *fin;
-    fin = fopen("input.txt", "r");
-    while (fscanf(fin, "%d", &array[i]) != EOF)
-        i++;
+    // 产生随机数据部分
+    if (argc != 2) {
+        fprintf(stderr, "Please input the num of array!\n");
+        return 1;
+    }
+    i = atoi(argv[1]);
+    array = (int*)malloc((i+2)*sizeof(int));
+    result = (int*)malloc((i+2)*sizeof(int));
+    random_array(array, i);
 
     // 开始mpi
     MPI_Init(&argc, &argv);
@@ -168,7 +160,7 @@ int main(int argc, char *argv[])
         result, newSize, recvIndex, MPI_INT, MPI_COMM_WORLD);
 
     // 归并排序
-    MergeSort(result, 0, totalSize-1);
+    merge_sort(result, 0, totalSize-1);
 
     MPI_Gather(&totalSize, 1, MPI_INT, recvIndex, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -180,7 +172,7 @@ int main(int argc, char *argv[])
     MPI_Gatherv(result, totalSize, MPI_INT, array, recvIndex, recvDisp, MPI_INT, 0, MPI_COMM_WORLD);
 
     if(id == 0)
-        debug(array, len);
+        print_array(array, len);
     
     MPI_Finalize();
     return 0;

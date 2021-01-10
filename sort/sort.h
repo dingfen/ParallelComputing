@@ -21,13 +21,13 @@
 void random_array(int *a, int num) {
     for(int i = 0; i < num; i++) {
         srand(clock());
-        a[i] = rand() % 100;
+        a[i] = rand() % 400;
     }
 }
 
 void print_array(int *a, int num) {
     for(int i = 0; i < num; i++) {
-        if (i % 10 == 0)
+        if (i % 20 == 0)
             printf("\n");
         printf("%d ", a[i]);
     }

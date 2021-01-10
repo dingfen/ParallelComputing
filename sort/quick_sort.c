@@ -18,12 +18,8 @@ int getpow2(int n) {
 
 int partition(int *a, int k, int l)
 {
-    srand(clock());
-    int r = rand() % (l-k+1);
-    int pivof = a[r];
-    int temp = a[l];
-    a[l] = a[r];
-    a[r] = temp;
+    int pivof = a[l];
+    int temp;
     int i = k-1;
     for(int j = k; j < l; j++) {
         if (a[j] <= pivof) {
@@ -147,6 +143,10 @@ int main(int argc, char *argv[])
 
     if (id_procs == 0) {
         print_array(a, n);
+        if (check_array(a, b, n))
+            printf("Done.\n");
+        else 
+            printf("Error Occured!\n");
     }
 
     free(a);
