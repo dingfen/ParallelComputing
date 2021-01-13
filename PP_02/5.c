@@ -81,8 +81,8 @@ int main(int argc, char *argv[])
         sC = (int*)malloc(N*N*sizeof(int));
 
         memset(sC, 0, N*N*sizeof(int));
-        random_mat(A, blksize);
-        random_mat(B, blksize);
+        random_mat(sA, N);
+        random_mat(sB, N);
         comp(sA, sB, sC, N);
     }
     A = (int*)malloc(blksize*blksize*sizeof(int));
@@ -131,43 +131,42 @@ int main(int argc, char *argv[])
     }
 
     MPI_Comm row_comm, col_comm;
-    int rank, size;
-    int color;
-    int key;
+    int rank_A, size_A;
+    int color_A;
+    int key_A;
 
-    printf("++++++++++++++++++++++\n");
+    int rank_B, size_B;
+    int color_B;
+    int key_B;
+
+    // Comm Group by row
+    key_A = id_procs % sqrt_procs;
+    color_A = id_procs / sqrt_procs;
+    MPI_Comm_split(MPI_COMM_WORLD, color_A, key_A, &row_comm);
+    MPI_Comm_rank(row_comm, &rank_A);
+    MPI_Comm_size(row_comm, &size_A);
+
+    // Comm Group by B
+    key_B = id_procs / sqrt_procs;
+    color_B = id_procs % sqrt_procs;
+    MPI_Comm_split(MPI_COMM_WORLD, color_B, key_B, &col_comm);
+    MPI_Comm_rank(col_comm, &rank_B);
+    MPI_Comm_size(col_comm, &size_B);
+
     for(int k = 0; k < sqrt_procs; k++) {
-        // Comm Group by row
-        key = id_procs % sqrt_procs;
-        color = id_procs / sqrt_procs;
-        MPI_Comm_split(MPI_COMM_WORLD, color, key, &row_comm);
-        MPI_Comm_rank(row_comm, &rank);
-        MPI_Comm_size(row_comm, &size);
-
-        if (rank == k) {
+        if (rank_A == (color_A+k)%size_A) {
             memcpy(A_in, A, blksize*blksize*sizeof(int));
         }
         // broadcast Ai,j
-        MPI_Bcast(A_in, 1, Mat, k, row_comm);
+        MPI_Bcast(A_in, 1, Mat, (color_A+k)%size_A, row_comm);
 
         // compute
         comp(A_in, B, C, blksize);
-        MPI_Comm_free(&row_comm);
 
-        // Comm Group by B
-        key = id_procs / sqrt_procs;
-        color = id_procs % sqrt_procs;
-        MPI_Comm_split(MPI_COMM_WORLD, color, key, &col_comm);
-        MPI_Comm_rank(col_comm, &rank);
-        MPI_Comm_size(col_comm, &size);
-
-        for(int i = 0; i < size; i++) {
-            int dest = (rank-1 + size)%size;
-            MPI_Send(B, 1, Mat, dest, 0, col_comm);
-            MPI_Recv(B_in, 1, Mat, (rank+1)%size, 0, col_comm, &status);
-        }
+        int dest = (rank_B-1 + size_B)%size_B;
+        MPI_Send(B, 1, Mat, dest, 0, col_comm);
+        MPI_Recv(B_in, 1, Mat, (rank_B+1)%size_B, 0, col_comm, &status);
         memcpy(B, B_in, blksize*blksize*sizeof(int));
-        MPI_Comm_free(&col_comm);
     }
 
 
@@ -191,11 +190,13 @@ int main(int argc, char *argv[])
         MPI_Recv(ans, 1, Mat, 0, 100, MPI_COMM_WORLD, &status);
     }
 
+    // print_mat(ans, blksize, id_procs);
+
     if (check(C, ans, blksize)) {
         printf("Proc#%d Done.\n", id_procs);
     }
 
-    MPI_Finalize();
+    // print_mat(C, blksize, id_procs);
 
     free(A);
     free(B);
@@ -209,5 +210,6 @@ int main(int argc, char *argv[])
         free(sB);
         free(sC);
     }
+    MPI_Finalize();
     return 0;
 }
