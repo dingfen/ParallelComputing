@@ -170,6 +170,7 @@ int main(int argc, char *argv[])
     free(A);
     free(B);
     free(C);
+    free(ans);
     free(A_in);
     free(B_in);
 
