@@ -31,6 +31,7 @@ void print_array(int *a, int num) {
             printf("\n");
         printf("%d ", a[i]);
     }
+    printf("\n");
 }
 
 int check_array(int *B, int *C, int num) {
