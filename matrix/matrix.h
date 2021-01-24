@@ -63,5 +63,15 @@ void matrix_multi(int *A, int *B, int *C, int num) {
     }
 }
 
+void matrix_transpose(int *a, int num) {
+    int temp;
+    for(int i = 1; i < num; i++) {
+        for(int j = 0; j < i; j++) {
+            temp = a[INDEX(i, j, num)];
+            a[INDEX(i, j, num)] = a[INDEX(j, i, num)];
+            a[INDEX(j, i, num)] = temp;
+        }
+    }
+}
 
 #endif // _MPI_SORT_H
